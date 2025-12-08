@@ -72,10 +72,20 @@ public class DetectionEngine {
     // Determine whether the input matches any matcher definitions for this rule
     private boolean matches(Rule rule, String data) {
         for (MatcherDef m : rule.getMatchers()) {
-            if (!"regex".equalsIgnoreCase(m.getType())) continue;
-            Pattern p = PATTERN_CACHE.computeIfAbsent(m.getPattern(), Pattern::compile);
-            if (p.matcher(data).find()) {
-                return true;
+            String type = m.getType();
+            if ("regex".equalsIgnoreCase(type)) {
+                Pattern p = PATTERN_CACHE.computeIfAbsent(m.getPattern(), Pattern::compile);
+                if (p.matcher(data).find()) {
+                    return true;
+                }
+            } else if ("fuzzy".equalsIgnoreCase(type)) {
+                // Fuzzy matching compares the entire pattern string with the input data.
+                // In a real implementation you might extract tokens or adjust the
+                // threshold dynamically.  Here we simply check if the pattern
+                // approximately matches the input using Levenshtein distance.
+                if (FuzzyMatcher.matches(m.getPattern(), data)) {
+                    return true;
+                }
             }
         }
         return false;
