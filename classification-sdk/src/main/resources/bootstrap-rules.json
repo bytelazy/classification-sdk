@@ -1,0 +1,31 @@
+{
+  "version": "bootstrap-1.0",
+  "rules": [
+    {
+      "id": "phone",
+      "name": "手机号",
+      "level": "L2",
+      "priority": 10,
+      "matchers": [
+        {
+          "type": "regex",
+          "pattern": "\\b1[3-9]\\d{9}\\b"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "idcard",
+      "name": "身份证号",
+      "level": "L3",
+      "priority": 20,
+      "matchers": [
+        {
+          "type": "regex",
+          "pattern": "\\b\\d{17}[0-9Xx]\\b"
+        }
+      ],
+      "enabled": true
+    }
+  ]
+}
