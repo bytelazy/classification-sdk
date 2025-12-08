@@ -1,0 +1,7 @@
+server:
+  port: 8081
+
+#
+# In a real deployment you would configure database connections
+# and other infrastructure here.  This demo sticks to an in-memory
+# policy repository and therefore requires only a port definition.
