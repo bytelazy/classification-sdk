@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+// import dictionary matcher for dictionary-based rule support
+import com.example.sdk.DictionaryMatcher;
+
 /**
  * Core classification engine that executes the rule matchers against input
  * strings. Caches compiled regular expressions and respects rule priority
@@ -53,7 +56,12 @@ public class DetectionEngine {
         sorted.sort(Comparator.comparing(Rule::getPriority).reversed());
 
         for (Rule rule : sorted) {
-            if (!rule.isEnabled()) continue;
+            if (!rule.isEnabled()) {
+                continue;
+            }
+            // Evaluate the rule against the input value. When operating in
+            // TOP_MATCH_ONLY mode the loop terminates after the first
+            // successful match due to the rules being ordered by priority.
             if (matches(rule, data)) {
                 matched.add(rule);
                 if (mode == ClassificationMode.TOP_MATCH_ONLY) {
@@ -69,24 +77,55 @@ public class DetectionEngine {
         return new DetectionResult(data, matched);
     }
 
-    // Determine whether the input matches any matcher definitions for this rule
+    /**
+     * Determine whether the input matches any matcher definitions for a given rule.
+     *
+     * <p>The matcher type dictates how the pattern is evaluated:
+     * <ul>
+     *   <li><strong>regex</strong> – the pattern is compiled into a
+     *       {@link java.util.regex.Pattern} and a search is performed on the input.</li>
+     *   <li><strong>fuzzy</strong> – the pattern is compared against the input
+     *       using a Levenshtein distance algorithm via {@link FuzzyMatcher}.</li>
+     *   <li><strong>dictionary</strong> – the pattern is treated as a comma or
+     *       semicolon separated list of keywords. If any keyword appears in the
+     *       input the matcher succeeds. See {@link DictionaryMatcher} for
+     *       details.</li>
+     * </ul>
+     * Additional matcher types can be added without modifying this method by
+     * implementing custom logic or by leveraging a pluggable matcher registry.
+     * </p>
+     *
+     * @param rule the classification rule
+     * @param data the input data to test
+     * @return {@code true} if the data satisfies any matcher of the rule,
+     *         {@code false} otherwise
+     */
     private boolean matches(Rule rule, String data) {
         for (MatcherDef m : rule.getMatchers()) {
             String type = m.getType();
+            if (type == null) {
+                continue;
+            }
             if ("regex".equalsIgnoreCase(type)) {
                 Pattern p = PATTERN_CACHE.computeIfAbsent(m.getPattern(), Pattern::compile);
                 if (p.matcher(data).find()) {
                     return true;
                 }
             } else if ("fuzzy".equalsIgnoreCase(type)) {
-                // Fuzzy matching compares the entire pattern string with the input data.
-                // In a real implementation you might extract tokens or adjust the
-                // threshold dynamically.  Here we simply check if the pattern
-                // approximately matches the input using Levenshtein distance.
+                // Compare the pattern and data using a fuzzy match. Note that
+                // FuzzyMatcher expects (pattern, text) order for its arguments.
                 if (FuzzyMatcher.matches(m.getPattern(), data)) {
                     return true;
                 }
+            } else if ("dictionary".equalsIgnoreCase(type)) {
+                // Dictionary matching checks whether any of the comma-separated
+                // keywords defined by the pattern appear in the input. Matching
+                // is case-insensitive.
+                if (DictionaryMatcher.matches(data, m.getPattern())) {
+                    return true;
+                }
             }
+            // ignore unknown matcher types
         }
         return false;
     }
