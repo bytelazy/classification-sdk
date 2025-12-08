@@ -7,7 +7,7 @@
       This module provides a simple policy management backend.  It exposes
       REST endpoints for creating, updating, deleting and listing
       classification rules.  The backend is intentionally simple and
-      stores policies in an in-memory data structure.  In a real
+      stores policies in an in‑memory data structure.  In a real
       production system you would back this service with a database and
       add authentication, authorization and auditing.  For the purpose
       of demonstrating the architecture described in the documentation
@@ -41,6 +41,15 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Thymeleaf enables simple server‑side rendering of HTML templates
+             for the operational UI.  It is optional; if you prefer a
+             standalone frontend you can remove this dependency and serve
+             the UI separately. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
         <!-- Lombok reduces boilerplate for getters/setters. It is optional. -->
