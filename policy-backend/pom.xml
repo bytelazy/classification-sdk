@@ -44,6 +44,13 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- Share SDK rule model classes for emitting rulesets -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>classification-sdk</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- Thymeleaf enables simple server‑side rendering of HTML templates
              for the operational UI.  It is optional; if you prefer a
              standalone frontend you can remove this dependency and serve

@@ -9,7 +9,7 @@ public class SdkConfig {
 
     // Default policy endpoint for the mock service
     private static final String DEFAULT_POLICY_URL =
-        "http://localhost:8080/api/v1/rules";
+        "http://localhost:8081/api/v1/rules";
 
     // Default polling interval is 15 minutes
     private static final int DEFAULT_POLL_INTERVAL_SECONDS = 900;

@@ -12,15 +12,15 @@ The project is comprised of several modules:
   against input text.  The SDK includes a pluggable rule engine,
   configuration polling with ETag support, fuzzy matching
   capabilities and bootstrap rules for offline operation.
-- **mock‑policy‑service** – A Spring Boot service that returns a
-  JSON document containing rules.  It serves as a simple backend
-  demonstrating how the SDK can fetch configuration from a remote
-  service.  The service supports live reloading of its `rules.json` file.
-- **policy‑backend** – A new module providing CRUD, approval and
+- **policy‑backend** – Provides CRUD, approval and
   publishing endpoints for managing policies.  Policies are stored
-  in memory for demonstration purposes.  This module can be wired
-  into a configuration pipeline to produce the JSON consumed by
-  the SDK.
+  in memory for demonstration purposes.  The backend also emits
+  rulesets (with ETag support) at `/api/v1/rules` so SDK clients can
+  poll for updates.
+- **sdk‑client‑mock** – A lightweight Spring Boot service that
+  demonstrates how an integrating application might call the
+  `classification-sdk`.  It exposes `/api/classify` for posting
+  text and returns matched rules from the SDK.
 - **docs** – Architecture diagrams, integration guides and design
   notes.  See below for details.
 
