@@ -11,45 +11,11 @@
         <!-- Compile to Java 8 bytecode -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <!-- Dependency versions -->
-        <jackson.version>2.15.2</jackson.version>
-        <okhttp.version>4.12.0</okhttp.version>
     </properties>
 
-    <dependencies>
-        <!-- OkHttp for HTTP client -->
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>${okhttp.version}</version>
-        </dependency>
-
-        <!-- Jackson for JSON parsing -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-
-        <!-- Logging via SLF4J and Logback -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.13</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.5.6</version>
-        </dependency>
-
-        <!-- Lombok to reduce boilerplate (optional) -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.32</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
+    <!--
+      The original project depended on several external libraries that cannot
+      be fetched in this offline environment. The SDK has been rewritten to be
+      self-contained, so no additional dependencies are required here.
+    -->
 </project>

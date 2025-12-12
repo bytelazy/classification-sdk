@@ -11,6 +11,13 @@ public class MatcherDef {
     private String pattern;     // regex or other pattern expression
     private Double confidence;  // optional confidence threshold
 
+    public MatcherDef() {}
+
+    public MatcherDef(String type, String pattern) {
+        this.type = type;
+        this.pattern = pattern;
+    }
+
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
 
