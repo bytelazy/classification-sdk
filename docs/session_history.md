@@ -14,14 +14,12 @@ The repository has evolved into a small platform for experimenting with data‐c
   * **HTTP client with ETag** (`PolicyHttpClient`) that performs conditional GETs to download rules from a remote service.  It handles `304 Not Modified` responses gracefully and logs errors without crashing the SDK.
   * **`DemoMain`** test harness under `src/test/java` showing how to integrate the SDK and observe hot updates.
 
-* **`mock-policy-service`** – A simple Spring Boot REST service that returns a JSON ruleset to the SDK.  It supports ETag headers and live reloading of its `rules.json` file.  This service allows the SDK to demonstrate dynamic rule updates without deploying a full backend.  **Note:** this module now uses **Spring Boot 2.7.18** and the `spring-boot-maven-plugin` is explicitly versioned to be compatible with JDK 8.
+* **`policy-backend`** – A Spring Boot backend exposing CRUD endpoints for policies with approval and publishing semantics.  Policies are stored in memory (a `PolicyRepository`) and managed through a `PolicyService`.  REST endpoints live in `PolicyController`, while `RulesController` emits SDK-compatible rulesets at `/api/v1/rules` with ETag handling.
 
-* **`policy-backend`** – A more complete backend exposing CRUD endpoints for policies using Spring Boot.  It stores policies in memory (a `PolicyRepository`) and provides a `PolicyService` for higher‐level operations.  REST endpoints are implemented in `PolicyController`.  The module also includes:
-  * A minimal **Thymeleaf web UI** (`ViewController`, `policies.html`) that lists existing policies and provides a form to create new ones.  This UI demonstrates how an operator might manage policies through a browser.
-  * Updated `pom.xml` with **Spring Boot 2.7.18** and the plugin version to maintain compatibility with JDK 8.  Lombok and Thymeleaf dependencies are included.
+* **`sdk-client-mock`** – A lightweight Spring Boot application that demonstrates how an integrating service would call the `classification-sdk`.  It exposes `/api/classify` to accept text input, invokes the SDK to classify the text and returns matched rules.
 
 * **`docs`** – Documentation has been expanded to help users and future developers.  Key documents include:
-  * **`architecture_overview.md`** – high‐level diagrams and descriptions of the SDK, mock service and policy backend, including data flows and deployment considerations.
+  * **`architecture_overview.md`** – high‐level diagrams and descriptions of the SDK, the policy backend and supporting demo services, including data flows and deployment considerations.
   * **`integration_guide.md`** – step‑by‑step instructions for integrating the SDK into other applications, including dependency information and configuration hints.
   * **`policy_backend.md`** – details of the policy backend API and data model, along with example requests and descriptions of each endpoint.
   * **`rule_engine.md`** – explains how matchers work (regex, fuzzy and dictionary) and how to extend the rule engine.
@@ -34,19 +32,19 @@ The repository has evolved into a small platform for experimenting with data‐c
 
 2. **Pull + ETag + Cache Strategy** – The SDK does not hardcode business rules.  Instead, it polls a remote policy service.  ETag headers avoid downloading unchanged rules, while local disk caching ensures the SDK continues to function if the network or service is unavailable.  Bootstrap rules are bundled inside the JAR as a last resort.
 
-3. **Mock Policy Service** – To simulate dynamic rule updates, we built a Spring Boot application that returns `rules.json` with an ETag header.  When the JSON file changes, the service automatically reloads it and updates the ETag.  This allowed us to test the SDK’s hot update mechanism without a real backend.
+3. **Policy Backend** – A backend with in‐memory storage, service and controller layers that can create, read, update, delete, approve and publish policies.  It also exposes a ruleset feed at `/api/v1/rules` for SDK clients, using ETag headers for efficient polling.  The backend is configured for Java 8 via Spring Boot 2.7.18.
 
-4. **Policy Backend** – To go beyond the mock service, a more sophisticated backend was added.  It includes in‐memory storage, service and controller layers, and can create, read, update, delete, approve and publish policies.  An operator UI built with Thymeleaf illustrates how policies might be managed in production.  This backend is also configured for Java 8 via Spring Boot 2.7.18.
+4. **SDK Client Mock** – A small Spring Boot service that calls the SDK directly to classify posted text.  It demonstrates the SDK integration surface without mocking the backend.
 
 5. **Extended Rule Engine** – Originally the engine only supported regex matchers.  Fuzzy matching (based on Levenshtein distance) and dictionary matching were introduced.  These additions are implemented in `FuzzyMatcher` and `DictionaryMatcher` classes and integrated into `DetectionEngine`.  Documentation (`advanced_rule_engine.md`) explains how to add further matchers.
 
 6. **Documentation Suite** – A comprehensive set of Markdown documents was added to the `docs` folder.  They cover architecture, integration, backend usage, rule engine internals, the operator frontend, and recommendations for future extensions.
 
-7. **Spring Boot Version Compatibility** – A compile error occurred when building the mock and backend services under Java 8 due to using Spring Boot 3.x (which requires Java 17).  To resolve this, both `mock-policy-service` and `policy-backend` were downgraded to **Spring Boot 2.7.18**.  The `spring-boot-maven-plugin` now specifies `${spring.boot.version}` as its version to ensure compatibility with JDK 8.  You can now run `mvn clean install -Dmaven.test.skip=true` in each module without encountering class file version mismatches.
+7. **Spring Boot Version Compatibility** – A compile error occurred when building the backend services under Java 8 due to using Spring Boot 3.x (which requires Java 17).  To resolve this, the Spring Boot modules were downgraded to **Spring Boot 2.7.18**.  The `spring-boot-maven-plugin` now specifies `${spring.boot.version}` as its version to ensure compatibility with JDK 8.  You can now run `mvn clean install -Dmaven.test.skip=true` in each module without encountering class file version mismatches.
 
 ## How to Continue
 
-* **Explore the source code** – See the `classification-sdk` module for core rule‐execution logic, caching, configuration and matching.  The `policy-backend` and `mock-policy-service` modules illustrate how to host rules and manage policies.
+* **Explore the source code** – See the `classification-sdk` module for core rule‐execution logic, caching, configuration and matching.  The `policy-backend` module hosts rules and manages policies, while the `sdk-client-mock` module demonstrates integrating the SDK.
 
 * **Read the documentation** – The `docs` folder contains architecture diagrams, API guides, integration tips and advanced engine topics.  These docs are essential for understanding how the system is intended to work and how to extend it.
 
@@ -57,7 +55,7 @@ The repository has evolved into a small platform for experimenting with data‐c
   mvn spring-boot:run
   ```
 
-  The first command compiles the code and packages it, skipping tests.  The second command runs the Spring Boot application (policy backend or mock service) so you can interact with it locally.
+  The first command compiles the code and packages it, skipping tests.  The second command runs the Spring Boot application (policy backend or SDK client mock) so you can interact with it locally.
 
 * **Future Directions** – Ideas discussed but not yet implemented include model-based (semantic) matchers, persistent storage for policies, user authentication/authorization, API gateway integration and more advanced UI features.  These can be explored in subsequent sessions.
 

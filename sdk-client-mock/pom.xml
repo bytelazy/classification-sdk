@@ -4,12 +4,12 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.example</groupId>
-    <artifactId>mock-policy-service</artifactId>
+    <artifactId>sdk-client-mock</artifactId>
     <version>0.1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>1.8</java.version>
-        <!-- Use a Spring Boot version compatible with Java 8 (Spring Boot 2.7.x) -->
         <spring.boot.version>2.7.18</spring.boot.version>
     </properties>
 
@@ -26,16 +26,28 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- Spring Boot Starter Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Jackson for JSON serialization -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <groupId>com.example</groupId>
+            <artifactId>classification-sdk</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.32</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -44,10 +56,8 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <!-- Use the same version as spring‑boot to avoid JDK mismatches -->
                 <version>${spring.boot.version}</version>
             </plugin>
         </plugins>
     </build>
-
 </project>
